@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { addTeacher, addStudent, getAllTeachers, getAllStudents } from "../services/adminService";
+import Admin from "../models/Admin";
 
 export const addTeacherController = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -31,7 +32,9 @@ export const addStudentController = async (req: Request, res: Response): Promise
 
 export const getAllTeachersController = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const teachers = await getAllTeachers();
+
+    const {adminId}=_req.query;
+    const teachers = await getAllTeachers(adminId);
     res.status(200).json(teachers);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
@@ -40,7 +43,8 @@ export const getAllTeachersController = async (_req: Request, res: Response): Pr
 
 export const getAllStudentsController = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const students = await getAllStudents();
+    const {adminId}=_req.query;
+    const students = await getAllStudents(adminId);
     res.status(200).json(students);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });

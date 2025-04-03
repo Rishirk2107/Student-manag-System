@@ -20,10 +20,10 @@ export const addStudent = async (name: string, email: string, password: string, 
   return await Student.create({ name, email, password: hashedPassword, adminId });
 };
 
-export const getAllTeachers = async () => {
-  return await Teacher.findAll({ include: Course });
+export const getAllTeachers = async (adminId:any) => {
+  return await Teacher.findAll({where:{adminId:adminId}});
 };
 
-export const getAllStudents = async () => {
-  return await Student.findAll();
+export const getAllStudents = async (adminId:any) => {
+  return await Student.findAll({where:{adminId:adminId}});
 };

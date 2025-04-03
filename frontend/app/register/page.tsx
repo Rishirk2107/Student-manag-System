@@ -13,53 +13,73 @@ export default function Register() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
+    collegeId: "",  // Added collegeId field
     collegeName: "",
     adminName: "",
     email: "",
     password: "",
     confirmPassword: "",
-  })
+  });
+
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const { name, value } = e.target;
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (formData.password !== formData.confirmPassword) {
+    toast({
+      title: "Passwords don't match",
+      description: "Please make sure your passwords match.",
+      variant: "destructive",
+    });
+    return;
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  setIsLoading(true);
 
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please make sure your passwords match.",
-        variant: "destructive",
-      })
-      return
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: formData.adminName,  // Adjusted key name
+        email: formData.email,
+        password: formData.password,
+        collegeId: parseInt(formData.collegeId, 10),  // Ensure it's an integer
+        collegeName: formData.collegeName,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Registration failed");
     }
 
-    setIsLoading(true)
+    toast({
+      title: "Registration successful!",
+      description: "Your college has been registered. You can now log in as an admin.",
+    });
 
-    // Here you would typically make an API call to register the admin
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      toast({
-        title: "Registration successful!",
-        description: "Your college has been registered. You can now log in as an admin.",
-      })
-
-      router.push("/login/admin")
-    } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "There was a problem with your registration. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
+    router.push("/login/admin");
+  } catch (error) {
+    toast({
+      title: "Registration failed",
+      description: error.message,
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
   }
+};
+
 
   return (
     <div className="container flex items-center justify-center min-h-screen py-10">
@@ -71,6 +91,18 @@ export default function Register() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
+            <div className="space-y-2">
+            <Label htmlFor="collegeId">College ID</Label>
+            <Input
+              id="collegeId"
+              name="collegeId"
+              placeholder="Enter your college ID"
+              required
+              value={formData.collegeId}
+              onChange={handleChange}
+            />
+          </div>
+
               <Label htmlFor="collegeName">College Name</Label>
               <Input
                 id="collegeName"

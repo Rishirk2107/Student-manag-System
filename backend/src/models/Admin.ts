@@ -6,7 +6,7 @@ class Admin extends Model {
   public name!: string;
   public email!: string;
   public password!: string;
-  public collegeId!: string;
+  public collegeId!: number;
   public collegeName!:string
 }
 

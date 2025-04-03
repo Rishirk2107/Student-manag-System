@@ -24,31 +24,47 @@ export default function AdminLogin() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    // Here you would typically make an API call to authenticate the admin
+    e.preventDefault();
+    setIsLoading(true);
+  
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Simulate successful login
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid email or password");
+      }
+  
+      // Store adminId in localStorage
+      localStorage.setItem("adminId", data.adminId);
+  
       toast({
         title: "Login successful",
         description: "Welcome back, Admin!",
-      })
-
-      router.push("/dashboard/admin")
+      });
+  
+      router.push("/dashboard/admin");
     } catch (error) {
       toast({
         title: "Login failed",
-        description: "Invalid email or password. Please try again.",
+        description: error.message,
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+  
 
   return (
     <div className="container flex items-center justify-center min-h-screen py-10">
